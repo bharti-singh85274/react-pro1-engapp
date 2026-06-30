@@ -6,6 +6,10 @@ import SplashScreen from '../screens/SplashScreen';
 import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import CourseScreen from '../screens/CourseScreen';
+import LessonScreen from '../screens/LessonScreen';
+import ProgressScreen from '../screens/ProgressScreen';
 
 import { RootStackParamList } from './types';
 
@@ -22,6 +26,10 @@ export default function AppNavigator() {
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Profile"component={ProfileScreen}/>
+        <Stack.Screen name="Course" component={CourseScreen} />
+        <Stack.Screen name="Lesson" component={LessonScreen} />
+      
       </Stack.Navigator>
     </NavigationContainer>
   );

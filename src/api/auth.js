@@ -1,5 +1,6 @@
-const BASE_URL = "http://127.0.0.1:8000/api"; 
-// example: http://192.168.1.5:8000/api
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const BASE_URL = "http://127.0.0.1:8000/api";
 
 export const loginUser = async (email, password) => {
   try {
@@ -7,20 +8,24 @@ export const loginUser = async (email, password) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept": "application/json",
       },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
 
-    return { status: response.status, data };
+    console.log("LOGIN API RESPONSE:", data);
+
+    if (response.ok && data.token) {
+      await AsyncStorage.setItem("token", data.token);
+      await AsyncStorage.setItem("user", JSON.stringify(data.user));
+    }
+
+    return data;
+
   } catch (error) {
-    return {
-      status: 500,
-      data: { message: "Network error" },
-    };
+    console.log("LOGIN ERROR:", error);
+    return { message: "Network error" };
   }
 };

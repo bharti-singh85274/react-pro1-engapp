@@ -1,15 +1,58 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-} from 'react-native';
+} from "react-native";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getProfile } from "../api/profile";
+import { getCourses } from "../api/course";
+import CourseCard from "../components/CourseCard";
 
 export default function HomeScreen({ navigation }) {
+
+  const [courses, setCourses] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Refresh when screen comes into focus
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      loadData();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  // Load both profile + courses
+  const loadData = async () => {
+    try {
+      setLoading(true);
+
+      const profile = await getProfile();
+      const courseData = await getCourses();
+
+      // SAFE COURSE PARSING (handles all Laravel formats)
+      const list =
+        courseData?.courses ||
+        courseData?.data?.courses ||
+        courseData;
+
+      setCourses(Array.isArray(list) ? list : []);
+
+      if (profile?.user) {
+        setUser(profile.user);
+      }
+
+    } catch (error) {
+      console.log("Home error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const logout = async () => {
     await AsyncStorage.removeItem("token");
@@ -17,137 +60,79 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      showsVerticalScrollIndicator={false}
-    >
+    <ScrollView style={styles.container}>
 
-      {/* Header */}
-
+      {/* HEADER */}
       <View style={styles.header}>
-
         <View>
-          <Text style={styles.greeting}>
-            👋 Welcome
-          </Text>
+          <Text style={styles.greeting}>👋 Welcome Back</Text>
 
           <Text style={styles.username}>
-            SpeakMaster Student
+            {loading ? "Loading..." : user?.name}
           </Text>
         </View>
 
         <View style={styles.streakCard}>
-          <Text style={styles.streakText}>
-            🔥 7 Days
-          </Text>
+          <Text style={styles.streakText}>🔥 7 Days</Text>
         </View>
-
       </View>
 
-      {/* Banner */}
+      {/* PROFILE BUTTON */}
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Profile")}
+        style={styles.profileButton}
+      >
+        <Text style={{ color: "#fff", fontWeight: "bold" }}>
+          My Profile
+        </Text>
+      </TouchableOpacity>
 
+      {/* BANNER */}
       <View style={styles.banner}>
-
         <Text style={styles.bannerTitle}>
           Keep Learning Every Day
         </Text>
-
         <Text style={styles.bannerSubtitle}>
           Improve your English speaking with daily practice.
         </Text>
-
       </View>
 
-      {/* Progress */}
-
+      {/* COURSES SECTION */}
       <Text style={styles.sectionTitle}>
-        Your Progress
+        Courses
       </Text>
 
-      <View style={styles.progressContainer}>
-
-        <View style={styles.progressCard}>
-          <Text style={styles.progressValue}>70%</Text>
-          <Text style={styles.progressLabel}>Speaking</Text>
-        </View>
-
-        <View style={styles.progressCard}>
-          <Text style={styles.progressValue}>55%</Text>
-          <Text style={styles.progressLabel}>Grammar</Text>
-        </View>
-
-      </View>
-
-      <View style={styles.progressContainer}>
-
-        <View style={styles.progressCard}>
-          <Text style={styles.progressValue}>82%</Text>
-          <Text style={styles.progressLabel}>Vocabulary</Text>
-        </View>
-
-        <View style={styles.progressCard}>
-          <Text style={styles.progressValue}>60%</Text>
-          <Text style={styles.progressLabel}>Listening</Text>
-        </View>
-
-      </View>
-
-      {/* Continue Learning */}
-
-      <Text style={styles.sectionTitle}>
-        Continue Learning
-      </Text>
-
-      <TouchableOpacity style={styles.lessonCard}>
-
-        <Text style={styles.lessonTitle}>
-          🎧 Daily Conversation Practice
+      {courses.length === 0 ? (
+        <Text style={{ color: "gray", marginTop: 10 }}>
+          No courses available
         </Text>
+      ) : (
+        courses.map((item) => (
+          <CourseCard
+            key={item.id}
+            item={item}
+            onPress={() =>
+              navigation.navigate("Course", {
+                courseId: item.id,
+              })
+            }
+          />
+        ))
+      )}
 
-        <Text style={styles.lessonSubtitle}>
-          Resume Lesson 3 of 10
+
+      <TouchableOpacity
+        style={styles.progressBtn}
+        onPress={() => navigation.navigate("Progress")}
+    >
+        <Text style={styles.btnText}>
+            📊 My Progress
         </Text>
+    </TouchableOpacity>
 
-      </TouchableOpacity>
+    
 
-      {/* Today's Lessons */}
-
-      <Text style={styles.sectionTitle}>
-        Today's Lessons
-      </Text>
-
-      <View style={styles.lessonItem}>
-        <Text style={styles.lessonEmoji}>📖</Text>
-        <Text style={styles.lessonText}>Basic Grammar</Text>
-      </View>
-
-      <View style={styles.lessonItem}>
-        <Text style={styles.lessonEmoji}>🎤</Text>
-        <Text style={styles.lessonText}>Speaking Practice</Text>
-      </View>
-
-      <View style={styles.lessonItem}>
-        <Text style={styles.lessonEmoji}>📝</Text>
-        <Text style={styles.lessonText}>Vocabulary Quiz</Text>
-      </View>
-
-      <View style={styles.lessonItem}>
-        <Text style={styles.lessonEmoji}>🎧</Text>
-        <Text style={styles.lessonText}>Listening Exercise</Text>
-      </View>
-
-      {/* Quote */}
-
-      <View style={styles.quoteCard}>
-
-        <Text style={styles.quote}>
-          "Practice English every day and confidence will follow."
-        </Text>
-
-      </View>
-
-      {/* Logout */}
-
+      {/* LOGOUT */}
       <TouchableOpacity
         style={styles.logoutButton}
         onPress={logout}
@@ -222,86 +207,15 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 28,
-    marginBottom: 15,
-    color: '#111827',
+    marginTop: 25,
   },
 
-  progressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 15,
-  },
-
-  progressCard: {
-    width: '48%',
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 16,
-    alignItems: 'center',
-    elevation: 3,
-  },
-
-  progressValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2563EB',
-  },
-
-  progressLabel: {
-    marginTop: 8,
-    color: '#6B7280',
-  },
-
-  lessonCard: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 16,
-    elevation: 2,
-  },
-
-  lessonTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-
-  lessonSubtitle: {
-    marginTop: 8,
-    color: '#6B7280',
-  },
-
-  lessonItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 18,
-    borderRadius: 14,
-    marginBottom: 12,
-  },
-
-  lessonEmoji: {
-    fontSize: 22,
-    marginRight: 15,
-  },
-
-  lessonText: {
-    fontSize: 16,
-    color: '#374151',
-  },
-
-  quoteCard: {
-    backgroundColor: '#E0F2FE',
-    padding: 18,
-    borderRadius: 16,
+  profileButton: {
+    backgroundColor: "#2563EB",
+    padding: 12,
+    borderRadius: 10,
+    alignItems: "center",
     marginTop: 20,
-  },
-
-  quote: {
-    color: '#0369A1',
-    textAlign: 'center',
-    fontStyle: 'italic',
-    fontSize: 15,
   },
 
   logoutButton: {
