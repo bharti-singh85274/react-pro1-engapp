@@ -10,6 +10,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 import CourseScreen from '../screens/CourseScreen';
 import LessonScreen from '../screens/LessonScreen';
 import ProgressScreen from '../screens/ProgressScreen';
+import QuizScreen from "../screens/QuizScreen";
+import QuizResultScreen from "../screens/QuizResultScreen";
 
 import { RootStackParamList } from './types';
 
@@ -29,7 +31,9 @@ export default function AppNavigator() {
         <Stack.Screen name="Profile"component={ProfileScreen}/>
         <Stack.Screen name="Course" component={CourseScreen} />
         <Stack.Screen name="Lesson" component={LessonScreen} />
-      
+        <Stack.Screen name="Progress" component={ProgressScreen} />
+        <Stack.Screen name="Quiz" component={QuizScreen}/>
+       <Stack.Screen name="QuizResult" component={QuizResultScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

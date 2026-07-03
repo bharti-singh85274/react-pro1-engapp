@@ -25,35 +25,73 @@ export default function LoginScreen({
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please fill all fields");
+  // const handleLogin = async () => {
+  //   if (!email || !password) {
+  //     Alert.alert("Error", "Please fill all fields");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   const result = await loginUser(email, password);
+
+  //   setLoading(false);
+
+  //   if (result.status === 200) {
+  //     // ✅ Save token
+  //     await AsyncStorage.setItem("token", result.data.token);
+
+  //     // optional save user
+  //     await AsyncStorage.setItem(
+  //       "user",
+  //       JSON.stringify(result.data.user)
+  //     );
+
+  //     // ✅ Go to Home
+  //     navigation.replace("Home");
+
+  //   } else {
+  //     Alert.alert("Login Failed", result.data.message || "Invalid credentials");
+  //   }
+  // };
+
+const handleLogin = async () => {
+  if (!email.trim() || !password.trim()) {
+    Alert.alert("Error", "Please enter email and password");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const res = await loginUser(email, password);
+
+    console.log("LOGIN RESPONSE:", res);
+
+    if (!res) {
+      Alert.alert("Error", "No response from server");
       return;
     }
 
-    setLoading(true);
+    if (res.token) {
+      // Verify token was saved
+      const savedToken = await AsyncStorage.getItem("token");
+      console.log("Saved Token:", savedToken);
 
-    const result = await loginUser(email, password);
-
-    setLoading(false);
-
-    if (result.status === 200) {
-      // ✅ Save token
-      await AsyncStorage.setItem("token", result.data.token);
-
-      // optional save user
-      await AsyncStorage.setItem(
-        "user",
-        JSON.stringify(result.data.user)
-      );
-
-      // ✅ Go to Home
-      navigation.replace("Home");
-
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      });
     } else {
-      Alert.alert("Login Failed", result.data.message || "Invalid credentials");
+      Alert.alert("Login Failed", res.message || "Invalid credentials");
     }
-  };
+  } catch (error) {
+    console.log("LOGIN ERROR:", error);
+    Alert.alert("Error", "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <View style={styles.container}>

@@ -1,126 +1,219 @@
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert
+    ScrollView,
+    View,
+    Text,
+    TouchableOpacity,
+    Alert,
 } from "react-native";
 
-import { getProfile, updateProfile } from "../api/profile";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import {
+    getProfile,
+    logout,
+} from "../api/profile";
+
+import { getProgress } from "../api/progress";
+
+import ProfileCard from "../components/ProfileCard";
+import StatCard from "../components/StatCard";
 
 export default function ProfileScreen({ navigation }) {
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+    const [user, setUser] = useState(null);
+    const [progress, setProgress] = useState(null);
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
+    useEffect(() => {
+        loadProfile();
+    }, []);
 
-  const loadProfile = async () => {
-    try {
-      const res = await getProfile();
+    const loadProfile = async () => {
 
-      if (res.user) {
-        setName(res.user.name);
-        setEmail(res.user.email);
-      }
+        const profile = await getProfile();
+        const prog = await getProgress();
 
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setUser(profile.user);
+        setProgress(prog);
+    };
 
-  const handleUpdate = async () => {
-    try {
-      setSaving(true);
+    const handleLogout = async () => {
 
-      const res = await updateProfile(name, email);
+        await logout();
 
-      if (res.user) {
-        Alert.alert("Success", res.message);
+        await AsyncStorage.removeItem("token");
 
-        // refresh home screen data
-        navigation.goBack();
-      }
+        navigation.replace("Login");
+    };
 
-    } catch (err) {
-      Alert.alert("Error", "Update failed");
-    } finally {
-      setSaving(false);
-    }
-  };
+    return (
 
-  return (
-    <View style={styles.container}>
+        <ScrollView
+            style={{
+                flex:1,
+                backgroundColor:"#F5F6FA"
+            }}
+        >
 
-      {/* BACK BUTTON */}
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={{ fontSize: 16 }}>⬅ Back</Text>
-      </TouchableOpacity>
+            <ProfileCard user={user}/>
 
-      <Text style={styles.title}>My Profile</Text>
+            <View
+                style={{
+                    flexDirection:"row",
+                    marginHorizontal:10
+                }}
+            >
 
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-        placeholder="Name"
-      />
+                <StatCard
+                    title="Completed"
+                    value={progress?.completed_count || 0}
+                />
 
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-      />
+                <StatCard
+                    title="XP"
+                    value={progress?.xp || 0}
+                />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleUpdate}
-      >
-        <Text style={styles.buttonText}>
-          {saving ? "Updating..." : "Update Profile"}
-        </Text>
-      </TouchableOpacity>
+            </View>
 
-    </View>
-  );
+            <View
+                style={{
+                    flexDirection:"row",
+                    marginHorizontal:10
+                }}
+            >
+
+                <StatCard
+                    title="Lessons"
+                    value={progress?.total_lessons || 0}
+                />
+
+                <StatCard
+                    title="Progress"
+                    value={`${progress?.percentage || 0}%`}
+                />
+
+            </View>
+
+            <TouchableOpacity
+
+                style={{
+                    backgroundColor:"#2563EB",
+                    margin:15,
+                    padding:16,
+                    borderRadius:10
+                }}
+
+                onPress={()=>{
+                    navigation.navigate("Progress")
+                }}
+
+            >
+
+                <Text
+                    style={{
+                        color:"#fff",
+                        textAlign:"center",
+                        fontWeight:"bold"
+                    }}
+                >
+                    View Learning Progress
+                </Text>
+
+            </TouchableOpacity>
+
+            <TouchableOpacity
+
+                style={{
+                    backgroundColor:"#10B981",
+                    marginHorizontal:15,
+                    padding:16,
+                    borderRadius:10
+                }}
+
+                onPress={()=>{
+
+                    Alert.alert(
+                        "Coming Soon",
+                        "Edit Profile Screen"
+                    );
+
+                }}
+
+            >
+
+                <Text
+                    style={{
+                        color:"#fff",
+                        textAlign:"center",
+                        fontWeight:"bold"
+                    }}
+                >
+                    Edit Profile
+                </Text>
+
+            </TouchableOpacity>
+
+            <TouchableOpacity
+
+                style={{
+                    backgroundColor:"#F59E0B",
+                    margin:15,
+                    padding:16,
+                    borderRadius:10
+                }}
+
+                onPress={()=>{
+
+                    Alert.alert(
+                        "Coming Soon",
+                        "Change Password Screen"
+                    );
+
+                }}
+
+            >
+
+                <Text
+                    style={{
+                        color:"#fff",
+                        textAlign:"center",
+                        fontWeight:"bold"
+                    }}
+                >
+                    Change Password
+                </Text>
+
+            </TouchableOpacity>
+
+            <TouchableOpacity
+
+                style={{
+                    backgroundColor:"#EF4444",
+                    marginHorizontal:15,
+                    marginBottom:30,
+                    padding:16,
+                    borderRadius:10
+                }}
+
+                onPress={handleLogout}
+
+            >
+
+                <Text
+                    style={{
+                        color:"#fff",
+                        textAlign:"center",
+                        fontWeight:"bold"
+                    }}
+                >
+                    Logout
+                </Text>
+
+            </TouchableOpacity>
+
+        </ScrollView>
+
+    );
+
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#F5F7FB",
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginVertical: 20,
-  },
-  input: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  button: {
-    backgroundColor: "#2563EB",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  }
-});

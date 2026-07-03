@@ -1,24 +1,31 @@
 export type RootStackParamList = {
-  Splash: undefined;
-  Onboarding: undefined;
-  Login: undefined;
-  Home: undefined;
-  Profile:undefined,
-  Progress: undefined,
 
+    Splash:undefined;
 
-  Course: {
-    courseId: number;
-  };
+    Onboarding:undefined;
 
+    Login:undefined;
 
-    Lesson: {
-    lesson: {
-      id: number;
-      title: string;
-      content: string;
-      video_url: string;
+    Home:undefined;
+
+    Profile:undefined;
+
+    Progress:undefined;
+
+    Course:{
+        slug:string;
     };
-  };
- 
+
+    Lesson:{
+        lessonId:number;
+    };
+
+    Quiz:{
+        lessonId:number;
+    };
+
+    QuizResult:{
+        result:any;
+    };
+
 };

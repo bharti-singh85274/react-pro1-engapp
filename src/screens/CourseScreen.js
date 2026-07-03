@@ -1,179 +1,132 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { getLessons } from "../api/lesson";
+import React, { useEffect, useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+import CourseHeader from "../components/course/CourseHeader";
+import CourseStats from "../components/course/CourseStats";
+
+import { getCourseBySlug } from "../api/course";
+import { getProgress } from "../api/progress";
 
 export default function CourseScreen({ route, navigation }) {
+  const { slug } = route.params;
 
-  const { courseId } = route.params;
-  console.log("COURSE ID RECEIVED:", courseId);
+  const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(null);
 
-  useEffect(() => {
-    loadLessons();
-  }, []);
+  const loadCourse = async () => {
+    try {
+      setLoading(true);
 
-//   const loadLessons = async () => {
-//     try {
-//       const res = await getLessons(courseId);
-//       setLessons(res);
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   };
+      const courseRes = await getCourseBySlug(slug);
+      const progressRes = await getProgress();
 
-const loadLessons = async () => {
-  try {
-    const res = await getLessons(courseId);
-    
-    setLessons(Array.isArray(res) ? res : []);
-  } catch (err) {
-    console.log(err);
+      const data = courseRes?.data || courseRes;
+
+      setCourse(data);
+      setLessons(data?.lessons || []);
+
+      setProgress(progressRes?.data || progressRes);
+
+    } catch (e) {
+      console.log("COURSE ERROR:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadCourse();
+    }, [slug])
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#2563EB" />
+      </View>
+    );
   }
-};
+
+  if (!course) {
+    return (
+      <View style={styles.center}>
+        <Text>Course not found</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
+      {/* <Image
+        source={{
+          uri: course.thumbnail
+            ? `http://192.168.1.11:8000/storage/${course.thumbnail}`
+            : "https://via.placeholder.com/600x300",
+        }}
+        style={styles.image}
+      />
 
+      <Text style={styles.title}>{course.title}</Text>
 
-        <View style={styles.header}>
-  <TouchableOpacity
-    style={styles.backButton}
-    onPress={() => navigation.goBack()}
-  >
-    <Text style={styles.backText}>← Back</Text>
-  </TouchableOpacity>
-</View>
+      <Text style={styles.description}>
+        {course.description}
+      </Text> */}
 
-      {/* HEADER */}
-      <View style={styles.header}>
-        <Text style={styles.title}>📘 Basic English Course</Text>
-        <Text style={styles.subtitle}>
-          Learn spoken English step by step
-        </Text>
-      </View>
+      <CourseHeader course={course} />
+      <CourseStats course={course} />
 
-      {/* WHAT YOU LEARN */}
-      <View style={styles.card}>
-        <Text style={styles.section}>🎯 What you'll learn</Text>
+      <Text style={styles.sectionTitle}>Lessons</Text>
 
-        <Text style={styles.point}>✔ Speak basic English</Text>
-        <Text style={styles.point}>✔ Daily conversation</Text>
-        <Text style={styles.point}>✔ Confidence in speaking</Text>
-      </View>
+      {lessons.map((l, index) => {
+        const isCompleted =
+          progress?.completed_lessons?.includes(l.id);
 
-      {/* LESSONS */}
-      <Text style={styles.sectionTitle}>📚 Lessons</Text>
-
-      {lessons.length === 0 ? (
-        <Text style={{ color: "gray" }}>No lessons found</Text>
-      ) : (
-        lessons.map((item, index) => (
+        return (
           <TouchableOpacity
-            key={item.id}
+            key={l.id}
             style={styles.lessonCard}
             onPress={() =>
-              navigation.navigate("Lesson", { lesson: item })
+              navigation.navigate("Lesson", {
+                lessonId: l.id,
+              })
             }
           >
             <Text style={styles.lessonTitle}>
-              🎥 Lesson {index + 1}: {item.title}
+              {index + 1}. {l.title}
             </Text>
 
-            <Text style={styles.lessonDesc} numberOfLines={2}>
-              {item.content}
+            <Text style={{ color: isCompleted ? "green" : "#6B7280" }}>
+              {isCompleted ? "✔ Completed" : "▶ Start"}
             </Text>
           </TouchableOpacity>
-        ))
-      )}
-
+        );
+      })}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F7FB",
-    padding: 15,
-  },
-
-  header: {
-    backgroundColor: "#2563EB",
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 15,
-  },
-
-  title: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "bold",
-  },
-
-  subtitle: {
-    color: "#E5E7EB",
-    marginTop: 5,
-  },
-
-  card: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 16,
-    marginBottom: 15,
-  },
-
-  section: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-
-  point: {
-    color: "#374151",
-    marginBottom: 4,
-  },
-
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-
+  container: { flex: 1, backgroundColor: "#F5F7FB" },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  sectionTitle: { fontSize: 18, fontWeight: "bold", padding: 15 },
   lessonCard: {
     backgroundColor: "#fff",
+    marginHorizontal: 15,
+    marginTop: 10,
     padding: 15,
     borderRadius: 12,
-    marginBottom: 10,
   },
-
-  lessonTitle: {
-    fontSize: 15,
-    fontWeight: "bold",
-    color: "#111827",
-  },
-
-
-  header: {
-  marginBottom: 15,
-},
-
-backButton: {
-  alignSelf: "flex-start",
-  backgroundColor: "#E5E7EB",
-  paddingHorizontal: 15,
-  paddingVertical: 8,
-  borderRadius: 8,
-},
-
-backText: {
-  color: "#111827",
-  fontSize: 16,
-  fontWeight: "600",
-},
-
-  lessonDesc: {
-    marginTop: 5,
-    color: "#6B7280",
-  },
+  lessonTitle: { fontSize: 16, fontWeight: "600" },
 });
