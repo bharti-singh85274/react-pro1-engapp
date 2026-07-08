@@ -13,13 +13,40 @@ export default function CourseCard({
   progress,
   onPress,
 }) {
+
+  const percentage = progress?.percentage ?? 0;
+  const completedLessons = progress?.completed_lessons ?? 0;
+  const totalLessons = progress?.total_lessons ?? item.lessons_count;
+  const status = progress?.status ?? "not_started";
+
+  const getStatusColor = () => {
+    switch (status) {
+      case "completed":
+        return "#16A34A";
+      case "in_progress":
+        return "#2563EB";
+      default:
+        return "#9CA3AF";
+    }
+  };
+
+  const getStatusText = () => {
+    switch (status) {
+      case "completed":
+        return "Completed";
+      case "in_progress":
+        return "In Progress";
+      default:
+        return "Not Started";
+    }
+  };
+
   return (
     <TouchableOpacity
       style={styles.card}
       onPress={onPress}
       activeOpacity={0.9}
     >
-
       <View style={styles.row}>
 
         <View style={{ flex: 1 }}>
@@ -49,18 +76,51 @@ export default function CourseCard({
 
       </View>
 
-      <View style={{ marginTop: 15 }}>
-        <ProgressBar progress={progress} />
+      {/* Progress */}
+
+      <View style={{ marginTop: 18 }}>
+
+        <ProgressBar progress={percentage} />
+
+      </View>
+
+      <View style={styles.progressRow}>
+
+        <Text style={styles.progressText}>
+          {completedLessons} / {totalLessons} Lessons
+        </Text>
+
+        <Text style={styles.progressPercent}>
+          {percentage}%
+        </Text>
+
+      </View>
+
+      <View style={styles.statusContainer}>
+
+        <View
+          style={[
+            styles.statusBadge,
+            {
+              backgroundColor: getStatusColor(),
+            },
+          ]}
+        >
+          <Text style={styles.statusText}>
+            {getStatusText()}
+          </Text>
+        </View>
+
       </View>
 
       <View style={styles.footer}>
 
         <Text style={styles.footerText}>
-          📚 {item.lessons_count} Lessons
+          ⭐ {item.rating}
         </Text>
 
         <Text style={styles.footerText}>
-          ⭐ {item.rating}
+          ⏱ {item.duration}
         </Text>
 
         <Text style={styles.footerText}>
@@ -111,6 +171,40 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
     fontSize: 12,
+  },
+
+  progressRow: {
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  progressText: {
+    color: "#4B5563",
+    fontSize: 13,
+  },
+
+  progressPercent: {
+    fontWeight: "700",
+    color: "#2563EB",
+  },
+
+  statusContainer: {
+    marginTop: 12,
+    alignItems: "flex-start",
+  },
+
+  statusBadge: {
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+
+  statusText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
   },
 
   footer: {

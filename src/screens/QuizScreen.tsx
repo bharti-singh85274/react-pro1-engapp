@@ -23,7 +23,8 @@ export default function QuizScreen({ route, navigation }) {
     try {
       setLoading(true);
       const res = await getQuiz(lessonId);
-
+      
+      console.log("QUIZ DATA:", res);
       setQuestions(res?.data || []);
     } catch (e) {
       console.log("QUIZ LOAD ERROR:", e);
@@ -84,7 +85,12 @@ export default function QuizScreen({ route, navigation }) {
             {index + 1}. {q.question}
           </Text>
 
-          {q.options.map((opt, i) => {
+          {/* {q.options.map((opt, i) => { */}
+
+          {(typeof q.options === "string"
+    ? JSON.parse(q.options)
+    : q.options
+).map((opt, i) => {
             const selected = answers[q.id] === opt;
 
             return (

@@ -5,42 +5,81 @@ import {
   View,
   ActivityIndicator,
   StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { logout } from "../api/auth";
 
 import { getCourses } from "../api/course";
 import { getProgress } from "../api/progress";
-
+import { getContinueLearning } from "../api/home";
 import CourseCard from "../components/CourseCard";
+import ContinueLearningCard from "../components/Home/ContinueLearningCard";
 
 export default function HomeScreen({ navigation }) {
   const [courses, setCourses] = useState([]);
   const [progress, setProgress] = useState(null);
+  const [continueLearning, setContinueLearning] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
 
-      const courseRes = await getCourses();
-      const progressRes = await getProgress();
+  const handleLogout = async () => {
+  try {
+    await logout();
+  } catch (e) {
+    // Ignore API error if token is already invalid.
+  }
 
-      console.log("COURSES :", courseRes);
-      console.log("PROGRESS :", progressRes);
+  navigation.reset({
+    index: 0,
+    routes: [{ name: "Login" }],
+  });
+};
 
-      setCourses(courseRes.data || []);
-      setProgress(progressRes);
+//  const loadData = async () => {
+//   setLoading(true);
 
-    } catch (error) {
-      console.log(
-        "HOME ERROR :",
-        error.response?.data || error.message
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+//   try {
+//     console.log("Loading courses...");
+//     const courseRes = await getCourses();
+//     console.log("COURSES:", courseRes);
+//     setCourses(courseRes.data || []);
+//   } catch (e) {
+//     console.log("COURSES ERROR:", e.response?.data || e.message);
+//   }
 
+//   try {
+//     console.log("Loading progress...");
+//     const progressRes = await getProgress();
+//     console.log("PROGRESS:", progressRes);
+//     setProgress(progressRes);
+//   } catch (e) {
+//     console.log("PROGRESS ERROR:", e.response?.data || e.message);
+//   }
+
+//   try {
+//     console.log("Loading continue...");
+//     const continueRes = await getContinueLearning();
+//     console.log("CONTINUE:", continueRes);
+//     setContinueLearning(continueRes.data);
+//   } catch (e) {
+//     console.log("CONTINUE ERROR:", e.response?.data || e.message);
+//   }
+
+//   setLoading(false);
+// };
+const loadData = async () => {
+  try {
+    const courseRes = await getCourses();
+    setCourses(courseRes.data || []);
+  } catch (e) {
+    console.log(e);
+  }
+
+  setProgress({ percentage: 0 });
+  setContinueLearning(null);
+  setLoading(false);
+};
   useFocusEffect(
     useCallback(() => {
       loadData();
@@ -64,6 +103,34 @@ export default function HomeScreen({ navigation }) {
       contentContainerStyle={styles.content}
     >
 
+
+      <View
+  style={{
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: 20,
+  }}
+>
+  <TouchableOpacity
+    onPress={handleLogout}
+    style={{
+      backgroundColor: "#EF4444",
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 8,
+    }}
+  >
+    <Text
+      style={{
+        color: "#FFFFFF",
+        fontWeight: "bold",
+      }}
+    >
+      Logout
+    </Text>
+  </TouchableOpacity>
+</View>
+
       {/* Header */}
 
       <Text style={styles.title}>
@@ -77,6 +144,17 @@ export default function HomeScreen({ navigation }) {
       {/* Progress Card */}
 
       <View style={styles.progressCard}>
+
+
+        <ContinueLearningCard
+          course={continueLearning?.course}
+          lesson={
+              continueLearning?.next_lesson ||
+              continueLearning?.current_lesson
+          }
+          progress={continueLearning?.progress}
+          navigation={navigation}
+      />
 
         <Text style={styles.progressTitle}>
           Overall Progress
@@ -96,15 +174,27 @@ export default function HomeScreen({ navigation }) {
 
       {courses.map((item) => (
 
+        // <CourseCard
+        //   key={item.id}
+        //   item={item}
+        //   // progress={progress?.percentage || 0}
+        //   progress={item.progress}
+        //   onPress={() =>
+        //     navigation.navigate("Course", {
+        //       slug: item.slug,
+        //     })
+        //   }
+        // />
+
         <CourseCard
-          key={item.id}
-          item={item}
-          progress={progress?.percentage || 0}
-          onPress={() =>
-            navigation.navigate("Course", {
-              slug: item.slug,
-            })
-          }
+            key={item.id}
+            item={item}
+            progress={item.progress}
+            onPress={() =>
+                navigation.navigate("Course", {
+                    slug: item.slug,
+                })
+            }
         />
 
       ))}

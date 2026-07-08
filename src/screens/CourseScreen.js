@@ -14,7 +14,7 @@ import CourseHeader from "../components/course/CourseHeader";
 import CourseStats from "../components/course/CourseStats";
 
 import { getCourseBySlug } from "../api/course";
-import { getProgress } from "../api/progress";
+import LessonCard from "../components/course/LessonCard";
 
 export default function CourseScreen({ route, navigation }) {
   const { slug } = route.params;
@@ -22,28 +22,54 @@ export default function CourseScreen({ route, navigation }) {
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState(null);
+
+
+  // const loadCourse = async () => {
+  //   try {
+  //     setLoading(true);
+
+  //     const courseRes = await getCourseBySlug(slug);
+  //     const progressRes = await getProgress();
+
+  //     const data = courseRes?.data || courseRes;
+
+  //     setCourse(data);
+  //     setLessons(data?.lessons || []);
+
+  //     setProgress(progressRes?.data || progressRes);
+
+  //   } catch (e) {
+  //     console.log("COURSE ERROR:", e);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
 
   const loadCourse = async () => {
-    try {
-      setLoading(true);
+  try {
 
-      const courseRes = await getCourseBySlug(slug);
-      const progressRes = await getProgress();
+    setLoading(true);
 
-      const data = courseRes?.data || courseRes;
+    const response = await getCourseBySlug(slug);
 
-      setCourse(data);
-      setLessons(data?.lessons || []);
+    const data = response.data;
 
-      setProgress(progressRes?.data || progressRes);
+    setCourse(data);
 
-    } catch (e) {
-      console.log("COURSE ERROR:", e);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setLessons(data.lessons || []);
+
+  } catch (e) {
+
+    console.log(e);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
+
 
   useFocusEffect(
     useCallback(() => {
@@ -69,27 +95,13 @@ export default function CourseScreen({ route, navigation }) {
 
   return (
     <ScrollView style={styles.container}>
-      {/* <Image
-        source={{
-          uri: course.thumbnail
-            ? `http://192.168.1.11:8000/storage/${course.thumbnail}`
-            : "https://via.placeholder.com/600x300",
-        }}
-        style={styles.image}
-      />
-
-      <Text style={styles.title}>{course.title}</Text>
-
-      <Text style={styles.description}>
-        {course.description}
-      </Text> */}
-
+  
       <CourseHeader course={course} />
       <CourseStats course={course} />
 
       <Text style={styles.sectionTitle}>Lessons</Text>
 
-      {lessons.map((l, index) => {
+      {/* {lessons.map((l, index) => {
         const isCompleted =
           progress?.completed_lessons?.includes(l.id);
 
@@ -112,7 +124,34 @@ export default function CourseScreen({ route, navigation }) {
             </Text>
           </TouchableOpacity>
         );
-      })}
+      })} */}
+
+      {lessons.map((lesson, index) => {
+
+  const previousLesson =
+    index === 0 ? null : lessons[index - 1];
+
+  const isLocked =
+    index > 0 && !previousLesson.completed;
+
+  return (
+
+    <LessonCard
+      key={lesson.id}
+      lesson={lesson}
+      index={index}
+      isLocked={isLocked}
+      onPress={() =>
+        navigation.navigate("Lesson", {
+          lessonId: lesson.id,
+        })
+      }
+    />
+
+  );
+
+})}
+
     </ScrollView>
   );
 }
