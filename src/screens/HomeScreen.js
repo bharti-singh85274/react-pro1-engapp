@@ -8,8 +8,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { logout } from "../api/auth";
-
 import { getCourses } from "../api/course";
 import { getProgress } from "../api/progress";
 import { getContinueLearning } from "../api/home";
@@ -36,38 +34,7 @@ export default function HomeScreen({ navigation }) {
   });
 };
 
-//  const loadData = async () => {
-//   setLoading(true);
 
-//   try {
-//     console.log("Loading courses...");
-//     const courseRes = await getCourses();
-//     console.log("COURSES:", courseRes);
-//     setCourses(courseRes.data || []);
-//   } catch (e) {
-//     console.log("COURSES ERROR:", e.response?.data || e.message);
-//   }
-
-//   try {
-//     console.log("Loading progress...");
-//     const progressRes = await getProgress();
-//     console.log("PROGRESS:", progressRes);
-//     setProgress(progressRes);
-//   } catch (e) {
-//     console.log("PROGRESS ERROR:", e.response?.data || e.message);
-//   }
-
-//   try {
-//     console.log("Loading continue...");
-//     const continueRes = await getContinueLearning();
-//     console.log("CONTINUE:", continueRes);
-//     setContinueLearning(continueRes.data);
-//   } catch (e) {
-//     console.log("CONTINUE ERROR:", e.response?.data || e.message);
-//   }
-
-//   setLoading(false);
-// };
 const loadData = async () => {
   try {
     const courseRes = await getCourses();
@@ -104,32 +71,6 @@ const loadData = async () => {
     >
 
 
-      <View
-  style={{
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 20,
-  }}
->
-  <TouchableOpacity
-    onPress={handleLogout}
-    style={{
-      backgroundColor: "#EF4444",
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 8,
-    }}
-  >
-    <Text
-      style={{
-        color: "#FFFFFF",
-        fontWeight: "bold",
-      }}
-    >
-      Logout
-    </Text>
-  </TouchableOpacity>
-</View>
 
       {/* Header */}
 

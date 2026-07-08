@@ -17,7 +17,8 @@ import { getCourseBySlug } from "../api/course";
 import LessonCard from "../components/course/LessonCard";
 
 export default function CourseScreen({ route, navigation }) {
-  const { slug } = route.params;
+  // const { slug } = route.params;
+  const slug = route.params?.slug;
 
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);

@@ -6,11 +6,15 @@ export type RootStackParamList = {
 
     Login:undefined;
 
-    Home:undefined;
+    MainTabs: undefined;
 
     Profile:undefined;
 
     Progress:undefined;
+
+    EditProfile:undefined;
+   
+    ChangePassword:undefined;
 
     Course:{
         slug:string;

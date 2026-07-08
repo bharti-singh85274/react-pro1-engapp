@@ -7,7 +7,8 @@ const { width } = Dimensions.get('window');
 export default function OnboardingItem({ item }) {
   return (
     <View style={styles.container}>
-      <Image source={item.image} style={styles.image} />
+    
+      <Image source={item.image}  resizeMode="contain" style={styles.image} />
 
       <Text style={styles.title}>{item.title}</Text>
 
@@ -19,39 +20,36 @@ export default function OnboardingItem({ item }) {
 }
 
 const styles = StyleSheet.create({
-//   container: {
-//     // width: 390,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     padding: 30,
-//   },
 
-  container: {
+ container: {
   width,
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: 30,
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  paddingHorizontal: 30,
 },
 
-  image: {
-    width: 280,
-    height: 280,
-    resizeMode: 'contain',
-    marginBottom: 40,
-  },
 
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    color: '#111827',
-    textAlign: 'center',
-  },
+image: {
+   width: width * 0.78,
+  height: 320,
+},
 
-  description: {
-    marginTop: 18,
-    fontSize: 17,
-    color: '#6B7280',
-    textAlign: 'center',
-    lineHeight: 28,
-  },
+ title: {
+  fontSize: 30,
+  fontWeight: "700",
+  color: "#111827",
+  textAlign: "center",
+},
+
+ description: {
+  marginTop: 20,
+  fontSize: 17,
+  color: "#6B7280",
+  textAlign: "center",
+  lineHeight: 28,
+  paddingHorizontal: 10,
+},
+
+
 });

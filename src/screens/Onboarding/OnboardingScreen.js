@@ -1,86 +1,93 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import {
   View,
   FlatList,
   Text,
   TouchableOpacity,
   StyleSheet,
-} from 'react-native';
+  Dimensions,
+} from "react-native";
 
-import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 
-import slides from './data';
-import OnboardingItem from './OnboardingItem';
+import slides from "./data";
+import OnboardingItem from "./OnboardingItem";
+
+const { width } = Dimensions.get("window");
 
 export default function OnboardingScreen() {
   const navigation = useNavigation();
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-
   const flatListRef = useRef(null);
 
-  // ✅ FIXED: reliable index tracking
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
-    if (viewableItems?.length > 0 && viewableItems[0].index != null) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const viewConfigRef = useRef({
+    viewAreaCoveragePercentThreshold: 50,
+  });
+
+  const onViewRef = useRef(({ viewableItems }) => {
+    if (
+      viewableItems &&
+      viewableItems.length > 0 &&
+      viewableItems[0].index != null
+    ) {
       setCurrentIndex(viewableItems[0].index);
     }
-  }).current;
+  });
 
-  const viewabilityConfig = useRef({
-    viewAreaCoveragePercentThreshold: 50,
-  }).current;
-
-  // ✅ NEXT BUTTON (FIXED)
-  const nextSlide = () => {
-    const nextIndex = currentIndex + 1;
-
-    if (nextIndex < slides.length) {
-      flatListRef.current?.scrollToIndex({
-        index: nextIndex,
+  const nextSlide = async () => {
+    if (currentIndex < slides.length - 1) {
+      flatListRef.current?.scrollToOffset({
+        offset: (currentIndex + 1) * width,
         animated: true,
       });
 
-      setCurrentIndex(nextIndex);
+      setCurrentIndex(currentIndex + 1);
     } else {
-      navigation.replace('Login');
+      await AsyncStorage.setItem(
+        "onboarding_completed",
+        "true"
+      );
+
+      navigation.replace("Login");
     }
   };
 
-  // ✅ SKIP BUTTON (FIXED)
-  const skip = () => {
-    const lastIndex = slides.length - 1;
+  const skip = async () => {
+    await AsyncStorage.setItem(
+      "onboarding_completed",
+      "true"
+    );
 
-    flatListRef.current?.scrollToIndex({
-      index: lastIndex,
-      animated: true,
-    });
-
-    setCurrentIndex(lastIndex);
+    navigation.replace("Login");
   };
 
   return (
     <View style={styles.container}>
-      
-      {/* ONBOARDING SLIDES */}
       <FlatList
         ref={flatListRef}
         data={slides}
         renderItem={({ item }) => (
           <OnboardingItem item={item} />
         )}
+        keyExtractor={(item) => item.id}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
-        scrollEventThrottle={16}
+        bounces={false}
+        onViewableItemsChanged={onViewRef.current}
+        viewabilityConfig={viewConfigRef.current}
+        onScrollToIndexFailed={(info) => {
+          flatListRef.current?.scrollToOffset({
+            offset: info.index * width,
+            animated: true,
+          });
+        }}
       />
 
-      {/* FOOTER */}
       <View style={styles.footer}>
-        
-        {/* DOTS */}
         <View style={styles.dots}>
           {slides.map((_, index) => (
             <View
@@ -93,32 +100,29 @@ export default function OnboardingScreen() {
           ))}
         </View>
 
-        {/* BUTTONS */}
         <View style={styles.buttons}>
-
-          {/* SKIP */}
-          {currentIndex !== slides.length - 1 && (
+          {currentIndex !== slides.length - 1 ? (
             <TouchableOpacity onPress={skip}>
-              <Text style={styles.skip}>Skip</Text>
+              <Text style={styles.skip}>
+                Skip
+              </Text>
             </TouchableOpacity>
+          ) : (
+            <View />
           )}
 
-          {/* NEXT / GET STARTED */}
           <TouchableOpacity
-            onPress={nextSlide}
             style={styles.button}
+            onPress={nextSlide}
           >
             <Text style={styles.buttonText}>
               {currentIndex === slides.length - 1
-                ? 'Get Started'
-                : 'Next'}
+                ? "Get Started"
+                : "Next"}
             </Text>
           </TouchableOpacity>
-
         </View>
-
       </View>
-
     </View>
   );
 }
@@ -126,7 +130,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#FFFFFF",
   },
 
   footer: {
@@ -135,8 +139,8 @@ const styles = StyleSheet.create({
   },
 
   dots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 30,
   },
 
@@ -144,37 +148,38 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#D1D5DB',
+    backgroundColor: "#D1D5DB",
     marginHorizontal: 5,
   },
 
   activeDot: {
-    width: 24,
-    backgroundColor: '#2563EB',
+    width: 28,
+    backgroundColor: "#2563EB",
   },
 
   buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 
   skip: {
-    fontSize: 18,
-    color: '#6B7280',
-    fontWeight: '600',
+    fontSize: 17,
+    color: "#6B7280",
+    fontWeight: "600",
   },
 
   button: {
-    backgroundColor: '#2563EB',
-    paddingHorizontal: 35,
-    paddingVertical: 15,
-    borderRadius: 14,
+    backgroundColor: "#2563EB",
+    paddingHorizontal: 40,
+    paddingVertical: 16,
+    borderRadius: 30,
+    elevation: 4,
   },
 
   buttonText: {
-    color: '#fff',
+    color: "#FFFFFF",
     fontSize: 17,
-    fontWeight: 'bold',
+    fontWeight: "700",
   },
 });

@@ -1,25 +1,23 @@
 export default [
   {
-    id: '1',
-    title: 'Learn English',
+    id: "1",
+    title: "Learn English Smarter",
     description:
-      'Master English speaking with fun and interactive lessons anytime, anywhere.',
-    image: require('../../../assets/images/welcome.png'),
+      "Build your English speaking skills with interactive lessons, quizzes, and daily practice.",
+    image: require("../../../assets/images/welcome.png"),
   },
   {
-    id: '2',
-    title: 'Practice Speaking',
+    id: "2",
+    title: "Speak with Confidence",
     description:
-      'Improve pronunciation by speaking and receiving instant feedback.',
-     image: require('../../../assets/images/speaking.png'),
-    
+      "Improve your pronunciation, grammar, and vocabulary through real-life conversations.",
+    image: require("../../../assets/images/speaking.png"),
   },
   {
-    id: '3',
-    title: 'Track Progress',
+    id: "3",
+    title: "Track Every Achievement",
     description:
-      'Complete lessons, earn achievements and monitor your daily progress.',
-      image: require('../../../assets/images/progress.png'),
-    
+      "Monitor your learning progress, complete lessons, and stay motivated every day.",
+    image: require("../../../assets/images/progress.png"),
   },
 ];

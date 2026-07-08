@@ -1,59 +1,84 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../navigation/types';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import Colors from '../constants/Colors';
+import Colors from "../constants/colors";
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
-
-export default function SplashScreen({ navigation }: Props) {
-
+export default function SplashScreen({ navigation }) {
   useEffect(() => {
-    const checkAuth = async () => {
-
+    const initialize = async () => {
       try {
+        const onboarding = await AsyncStorage.getItem(
+          "onboarding_completed"
+        );
+
         const token = await AsyncStorage.getItem("token");
 
-        console.log("TOKEN FROM STORAGE:", token);
-
         setTimeout(() => {
-
-          // SAFE CHECK
-          if (token && token !== "undefined" && token !== "null") {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "Home" }],
-            });
-          } else {
+          // First time user
+          if (!onboarding) {
             navigation.reset({
               index: 0,
               routes: [{ name: "Onboarding" }],
             });
+            return;
           }
 
-        }, 2000);
+          // Already logged in
+          if (token && token !== "null" && token !== "undefined") {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "MainTabs" }],
+            });
+            return;
+          }
 
+          // Login required
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          });
+        }, 2000);
       } catch (error) {
-        console.log("Splash error:", error);
-        navigation.replace("Onboarding");
+        console.log(error);
+
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Login" }],
+        });
       }
     };
 
-    checkAuth();
+    initialize();
   }, []);
 
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/images/logo.png')}
+        source={require("../../assets/images/logo.png")}
         style={styles.logo}
       />
 
-      <Text style={styles.title}>SpeakMaster</Text>
-      <Text style={styles.subtitle}>Learn English Anywhere</Text>
+      <Text style={styles.title}>
+        SpeakMaster
+      </Text>
+
+      <Text style={styles.subtitle}>
+        Learn English With Confidence
+      </Text>
+
+      <ActivityIndicator
+        size="large"
+        color={Colors.primary}
+        style={{ marginTop: 35 }}
+      />
     </View>
   );
 }
@@ -61,24 +86,28 @@ export default function SplashScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.white,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 25,
   },
+
   logo: {
-    width: 180,
-    height: 180,
-    resizeMode: 'contain',
+    width: 170,
+    height: 170,
+    resizeMode: "contain",
   },
+
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    marginTop: 25,
+    fontSize: 34,
+    fontWeight: "bold",
     color: Colors.primary,
-    marginTop: 20,
   },
+
   subtitle: {
+    marginTop: 10,
     fontSize: 16,
-    color: Colors.gray,
-    marginTop: 8,
+    color: "#6B7280",
   },
 });
