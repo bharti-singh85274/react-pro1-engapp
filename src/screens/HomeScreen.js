@@ -37,16 +37,53 @@ export default function HomeScreen({ navigation }) {
 
 const loadData = async () => {
   try {
-    const courseRes = await getCourses();
-    setCourses(courseRes.data || []);
-  } catch (e) {
-    console.log(e);
-  }
 
-  setProgress({ percentage: 0 });
-  setContinueLearning(null);
-  setLoading(false);
+    setLoading(true);
+
+    const courseRes = await getCourses();
+
+    const progressRes = await getProgress();
+
+    const continueRes = await getContinueLearning();
+
+    // console.log("COURSES", courseRes);
+    console.log(
+      "COURSES API RESPONSE",
+      JSON.stringify(courseRes, null, 2)
+    );
+
+
+    // console.log("PROGRESS", progressRes);
+    console.log(
+      "PROGRESS API RESPONSE",
+      JSON.stringify(progressRes, null, 2)
+    );
+
+
+    //console.log("CONTINUE", continueRes);
+    console.log(
+      "CONTINUE API RESPONSE",
+      JSON.stringify(continueRes, null, 2)
+    );
+
+    setCourses(courseRes.data || []);
+
+    setProgress(progressRes);
+
+    setContinueLearning(continueRes.data);
+
+  } catch (e) {
+
+    console.log("HOME ERROR", e);
+
+  } finally {
+
+    setLoading(false);
+
+  }
 };
+
+
   useFocusEffect(
     useCallback(() => {
       loadData();
@@ -114,18 +151,6 @@ const loadData = async () => {
       </Text>
 
       {courses.map((item) => (
-
-        // <CourseCard
-        //   key={item.id}
-        //   item={item}
-        //   // progress={progress?.percentage || 0}
-        //   progress={item.progress}
-        //   onPress={() =>
-        //     navigation.navigate("Course", {
-        //       slug: item.slug,
-        //     })
-        //   }
-        // />
 
         <CourseCard
             key={item.id}

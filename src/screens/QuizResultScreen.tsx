@@ -24,7 +24,11 @@ export default function QuizResultScreen({ route, navigation }) {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate("MainTabs")}
+        // onPress={() => navigation.navigate("MainTabs")}
+        onPress={() => {
+            console.log("GOING TO HOME");
+            navigation.navigate("MainTabs");
+        }}
       >
         <Text style={styles.buttonText}>Go Home</Text>
       </TouchableOpacity>

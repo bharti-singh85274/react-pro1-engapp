@@ -54,9 +54,9 @@ export default function ProgressScreen() {
           Overall Progress
         </Text>
 
-        <ProgressBar
-          percentage={progress?.percentage}
-        />
+      <ProgressBar
+    progress={progress?.percentage ?? 0}
+/>
 
         <Text style={styles.percent}>
           {progress?.percentage}%

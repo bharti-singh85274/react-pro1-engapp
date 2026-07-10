@@ -1,4 +1,5 @@
 import client from "./client";
+import { clearStorage } from "../utils/storage";
 
 export const getProfile = async () => {
     const res = await client.get("/profile");
@@ -15,7 +16,26 @@ export const changePassword = async (data) => {
     return res.data;
 };
 
+
+
 export const logout = async () => {
-    const res = await client.post("/logout");
-    return res.data;
+
+    try {
+
+        await client.post("/logout");
+
+    } catch(error:any) {
+
+        console.log(
+            "Logout API failed:",
+            error.response?.data
+        );
+
+    } finally {
+
+        // Always remove token locally
+        await clearStorage();
+
+    }
+
 };

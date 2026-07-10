@@ -48,13 +48,22 @@ export default function QuizScreen({ route, navigation }) {
 
   // ---------------- SUBMIT QUIZ ----------------
   const submit = async () => {
+
+    console.log("Submitting lesson:", lessonId);
     try {
       if (Object.keys(answers).length === 0) {
         Alert.alert("Error", "Please answer at least one question");
         return;
       }
 
+      // const res = await submitQuiz(lessonId, answers);
+
+      // navigation.replace("QuizResult", {
+      //   result: res,
+      // });
       const res = await submitQuiz(lessonId, answers);
+
+      console.log("QUIZ SUBMIT RESPONSE:", res);
 
       navigation.replace("QuizResult", {
         result: res,

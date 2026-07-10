@@ -98,10 +98,23 @@ export default function LoginScreen({
             autoCapitalize="none"
           />
 
-          <TouchableOpacity style={styles.forgotContainer}>
-            <Text style={styles.forgot}>
-              Forgot Password?
-            </Text>
+         
+      <TouchableOpacity
+              onPress={() =>
+                  navigation.navigate("ForgotPassword")
+              }
+          >
+              <Text
+                  style={{
+                      alignSelf: "flex-end",
+                      marginTop: 10,
+                      marginBottom: 20,
+                      color: Colors.primary,
+                      fontWeight: "600"
+                  }}
+              >
+                  Forgot Password?
+              </Text>
           </TouchableOpacity>
 
           <Button
@@ -118,11 +131,14 @@ export default function LoginScreen({
             Don't have an account?
           </Text>
 
-          <TouchableOpacity>
+        <TouchableOpacity
+            onPress={() => navigation.navigate("Signup")}
+        >
             <Text style={styles.signUp}>
-              Sign Up
+                Sign Up
             </Text>
-          </TouchableOpacity>
+        </TouchableOpacity>
+        
         </View>
       </View>
     </Screen>

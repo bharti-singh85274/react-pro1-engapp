@@ -24,35 +24,15 @@ export default function CourseScreen({ route, navigation }) {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
 
-
-  // const loadCourse = async () => {
-  //   try {
-  //     setLoading(true);
-
-  //     const courseRes = await getCourseBySlug(slug);
-  //     const progressRes = await getProgress();
-
-  //     const data = courseRes?.data || courseRes;
-
-  //     setCourse(data);
-  //     setLessons(data?.lessons || []);
-
-  //     setProgress(progressRes?.data || progressRes);
-
-  //   } catch (e) {
-  //     console.log("COURSE ERROR:", e);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
   const loadCourse = async () => {
   try {
 
     setLoading(true);
 
     const response = await getCourseBySlug(slug);
+
+    console.log("COURSE SLUG:", slug);
+console.log("COURSE RESPONSE:", response.data.title);
 
     const data = response.data;
 

@@ -24,14 +24,11 @@ export default function LessonScreen({ route, navigation }) {
     try {
       setLoading(true);
 
-      // const res = await getLessonById(lessonId);
-      // const data = res?.data || res;
-
-      // setLesson(data);
-
       const res = await getLessonById(lessonId);
 
-        console.log("Lesson API:", res);
+        // console.log("Lesson API:", res);
+        console.log("Lesson ID:", lessonId);
+        console.log("Lesson Data:", res);
 
         setLesson(res);
     } catch (e) {
