@@ -20,6 +20,8 @@ import Typography from "../constants/typography";
 
 import { registerUser } from "../api/auth";
 
+import { validateSignup } from "../utils/validation";
+
 type Props = NativeStackScreenProps<
   RootStackParamList,
   "Signup"
@@ -53,36 +55,22 @@ const handleSignup = async () => {
 
   console.log("2. After setErrors");
 
-  let validationErrors: any = {};
+ 
+  const validationErrors = validateSignup(
+      name,
+      email,
+      password,
+      confirmPassword
+    );
 
-  if (!name.trim()) {
-    validationErrors.name = "Name is required.";
-  }
+    if (Object.keys(validationErrors).length > 0) {
 
-  if (!email.trim()) {
-    validationErrors.email = "Email is required.";
-  }
+      setErrors(validationErrors);
 
-  if (!password) {
-    validationErrors.password = "Password is required.";
-  }
+      return;
 
-  if (!confirmPassword) {
-    validationErrors.password_confirmation =
-      "Confirm Password is required.";
-  }
-
-  if (
-    password &&
-    confirmPassword &&
-    password !== confirmPassword
-  ) {
-    validationErrors.password_confirmation =
-      "Passwords do not match.";
-  }
-
-  console.log("3. Validation Errors:", validationErrors);
-
+    }
+    
   if (Object.keys(validationErrors).length > 0) {
     console.log("4. Returning because of validation");
     setErrors(validationErrors);
@@ -108,11 +96,39 @@ const handleSignup = async () => {
       routes: [{ name: "MainTabs" }],
     });
 
-  } catch (error: any) {
-    console.log("7. API Error");
-    console.log(error.response?.status);
-    console.log(error.response?.data);
-  } finally {
+  } 
+ catch (error: any) {
+
+  console.log("7. API Error");
+  console.log(error.response?.status);
+  console.log(error.response?.data);
+
+  if (error.response?.status === 422) {
+
+    const apiErrors = error.response.data.errors || {};
+
+    const formattedErrors: any = {};
+
+    Object.keys(apiErrors).forEach((key) => {
+      formattedErrors[key] = apiErrors[key][0];
+    });
+
+    setErrors(formattedErrors);
+
+  } else {
+
+    Alert.alert(
+      "Registration Failed",
+      error.response?.data?.message ||
+      "Something went wrong. Please try again."
+    );
+
+  }
+
+}
+  
+  
+  finally {
     console.log("8. Finally");
     setLoading(false);
   }
@@ -145,7 +161,19 @@ const handleSignup = async () => {
             label="Full Name"
             placeholder="Enter your full name"
             value={name}
-            onChangeText={setName}
+            onChangeText={(text) => {
+
+                setName(text);
+
+                setErrors((prev:any)=>({
+
+                    ...prev,
+
+                    name:null
+
+                }));
+
+            }}
             error={errors.name}
           />
 
@@ -153,7 +181,19 @@ const handleSignup = async () => {
             label="Email"
             placeholder="Enter your email"
             value={email}
-            onChangeText={setEmail}
+           onChangeText={(text)=>{
+
+                setEmail(text);
+
+                setErrors((prev:any)=>({
+
+                    ...prev,
+
+                    email:null
+
+                }));
+
+            }}
             keyboardType="email-address"
             autoCapitalize="none"
             error={errors.email}
@@ -163,7 +203,19 @@ const handleSignup = async () => {
             label="Password"
             placeholder="Enter password"
             value={password}
-            onChangeText={setPassword}
+           onChangeText={(text)=>{
+
+              setPassword(text);
+
+              setErrors((prev:any)=>({
+
+                  ...prev,
+
+                  password:null
+
+              }));
+
+          }}
             secureTextEntry
             error={errors.password}
           />
@@ -172,7 +224,19 @@ const handleSignup = async () => {
             label="Confirm Password"
             placeholder="Confirm password"
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
+          onChangeText={(text)=>{
+
+              setConfirmPassword(text);
+
+              setErrors((prev:any)=>({
+
+                  ...prev,
+
+                  password_confirmation:null
+
+              }));
+
+          }}
             secureTextEntry
             error={errors.password_confirmation}
           />

@@ -11,6 +11,7 @@ import Colors from "../../constants/colors";
 import Radius from "../../constants/radius";
 import Typography from "../../constants/typography";
 import Shadow from "../../constants/shadow";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 type InputProps = TextInputProps & {
   label: string;
@@ -32,25 +33,36 @@ export default function Input({
       <Text style={styles.label}>{label}</Text>
 
       {/* Input */}
-      <TextInput
+    <TextInput
         {...props}
         secureTextEntry={secureTextEntry}
         placeholderTextColor={Colors.subText}
         style={[
           styles.input,
-          focused && styles.focusedInput,
+          focused && !error && styles.focusedInput,
+          error && styles.inputError,
           style,
         ]}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
       />
 
+
       {/* Error */}
-      {!!error && (
-        <Text style={styles.error}>
-          {error}
+     {error ? (
+    <View style={styles.errorContainer}>
+        <Ionicons
+            name="alert-circle"
+            size={16}
+            color="#D32F2F"
+        />
+
+        <Text style={styles.errorText}>
+            {error}
         </Text>
-      )}
+    </View>
+) : null}
+
     </View>
   );
 }
@@ -98,4 +110,32 @@ const styles = StyleSheet.create({
 
     fontSize: Typography.caption,
   },
+
+
+  errorContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FDECEC",
+    borderLeftWidth: 4,
+    borderLeftColor: "#D32F2F",
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    marginTop: 6,
+    borderRadius: 8,
+},
+
+errorText: {
+    color: "#D32F2F",
+    fontSize: 13,
+    marginLeft: 8,
+    flex: 1,
+},
+
+
+inputError: {
+    borderColor: "#D32F2F",
+    borderWidth: 2,
+},
+
+
 });

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
+
 export default function ProgressBar({ progress = 0 }) {
   return (
     <View style={styles.container}>
@@ -12,6 +13,12 @@ export default function ProgressBar({ progress = 0 }) {
     </View>
   );
 }
+
+
+export const getProgress = async () => {
+    const res = await client.get("/progress");
+    return res.data;
+};
 
 const styles = StyleSheet.create({
   container: {
