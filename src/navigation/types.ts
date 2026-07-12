@@ -36,6 +36,8 @@ export type RootStackParamList = {
   QuizResult: {
     score: number;
     total: number;
+    result: any;
+    lessonId: number;
   };
 
   ForgotPassword: undefined;
@@ -46,6 +48,13 @@ export type RootStackParamList = {
   PrivacyPolicy: undefined;
 
   About: undefined;
+
+  QuizReview: {
+  result: any;
+};
+
+
+
 
 
 

@@ -22,6 +22,7 @@ import ResetPasswordScreen from "../screens/ResetPasswordScreen";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import PrivacyPolicyScreen from "../screens/PrivacyPolicyScreen";
 import AboutScreen from "../screens/AboutScreen";
+import QuizReviewScreen from "../screens/QuizReviewScreen";
 
 
 import { RootStackParamList } from './types';
@@ -49,11 +50,13 @@ export default function AppNavigator() {
         <Stack.Screen name="EditProfile" component={EditProfileScreen}/>
         <Stack.Screen name="ChangePassword" component={ChangePasswordScreen}/>
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen}/>
-        <Stack.Screen name="VerifyOtp"component={VerifyOtpScreen}/>
-        <Stack.Screen name="ResetPassword"component={ResetPasswordScreen}/>
-        <Stack.Screen name="Notifications"component={NotificationsScreen}/>
+        <Stack.Screen name="VerifyOtp" component={VerifyOtpScreen}/>
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen}/>
+        <Stack.Screen name="Notifications" component={NotificationsScreen}/>
         <Stack.Screen name="PrivacyPolicy"component={PrivacyPolicyScreen} />
         <Stack.Screen name="About" component={AboutScreen} />
+        <Stack.Screen name="QuizReview" component={QuizReviewScreen} />
+
 
       </Stack.Navigator>
     </NavigationContainer>

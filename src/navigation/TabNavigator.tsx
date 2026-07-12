@@ -30,23 +30,26 @@ export default function TabNavigator() {
         tabBarIcon: ({ color, size }) => {
           let iconName: any = "MainTabs";
 
-          switch (route.name) {
-            case "MainTabs":
-              iconName = "MainTabs";
-              break;
+       switch (route.name) {
+          case "MainTabs":
+            iconName = "home";
+            break;
 
-            case "Courses":
-              iconName = "book";
-              break;
+          case "Courses":
+            iconName = "book";
+            break;
 
-            case "Progress":
-              iconName = "stats-chart";
-              break;
+          case "Progress":
+            iconName = "stats-chart";
+            break;
 
-            case "Profile":
-              iconName = "person";
-              break;
-          }
+          case "Profile":
+            iconName = "person";
+            break;
+
+          default:
+            iconName = "ellipse";
+        }
 
           return (
             <Ionicons

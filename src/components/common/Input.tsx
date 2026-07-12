@@ -12,6 +12,7 @@ import Radius from "../../constants/radius";
 import Typography from "../../constants/typography";
 import Shadow from "../../constants/shadow";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { TouchableOpacity } from "react-native";
 
 type InputProps = TextInputProps & {
   label: string;
@@ -27,25 +28,51 @@ export default function Input({
 }: InputProps) {
   const [focused, setFocused] = useState(false);
 
+ const [hidePassword, setHidePassword] = useState(
+  secureTextEntry ?? false
+);
+
   return (
     <View style={styles.wrapper}>
       {/* Label */}
       <Text style={styles.label}>{label}</Text>
 
       {/* Input */}
-    <TextInput
-        {...props}
-        secureTextEntry={secureTextEntry}
-        placeholderTextColor={Colors.subText}
-        style={[
-          styles.input,
-          focused && !error && styles.focusedInput,
-          error && styles.inputError,
-          style,
-        ]}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
+   
+   <View
+  style={[
+    styles.inputContainer,
+    focused && styles.focusedInput,
+    error && styles.inputError,
+  ]}
+>
+  <TextInput
+    {...props}
+    style={[styles.input, style]}
+    secureTextEntry={!!hidePassword}
+    onFocus={(e) => {
+      setFocused(true);
+      props.onFocus?.(e);
+    }}
+    onBlur={(e) => {
+      setFocused(false);
+      props.onBlur?.(e);
+    }}
+  />
+
+  {secureTextEntry && (
+    <TouchableOpacity
+      onPress={() => setHidePassword(!hidePassword)}
+      style={styles.eyeButton}
+    >
+      <Ionicons
+        name={hidePassword ? "eye-off-outline" : "eye-outline"}
+        size={22}
+        color="#666"
       />
+    </TouchableOpacity>
+  )}
+</View>
 
 
       {/* Error */}
@@ -79,25 +106,34 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 
-  input: {
-    height: 58,
 
-    backgroundColor: Colors.inputBackground,
 
-    borderWidth: 1,
+inputContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: Colors.inputBackground,
+  borderWidth: 1,
+  borderColor: Colors.border,
+  borderRadius: Radius.xl,
+  paddingHorizontal: 16,
+  ...Shadow,
+},
 
-    borderColor: Colors.border,
+input: {
+  flex: 1,
+  height: 52,
+  fontSize: Typography.body,
+  color: Colors.text,
+  paddingLeft: 6,
+  paddingVertical: 0,
+  borderWidth: 0,
+  backgroundColor: "transparent",
+},
 
-    borderRadius: Radius.xl,
+eyeButton: {
+  paddingLeft: 10,
+},
 
-    paddingHorizontal: 18,
-
-    fontSize: Typography.body,
-
-    color: Colors.text,
-
-    ...Shadow,
-  },
 
   focusedInput: {
     borderColor: Colors.primary,

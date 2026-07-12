@@ -4,7 +4,7 @@ import { clearStorage } from "../utils/storage";
 
 
 const client = axios.create({
-  baseURL: "http://192.168.1.30:8000/api",
+  baseURL: "http://10.214.7.181:8000/api",
   timeout: 15000,
   headers: {
     Accept: "application/json",

@@ -5,7 +5,6 @@ import client from "./client";
  */
 export const getLessons = async (slug: string) => {
   const response = await client.get(`/courses/${slug}/lessons`);
-
   return response.data;
 };
 
@@ -15,7 +14,7 @@ export const getLessons = async (slug: string) => {
 export const getLessonById = async (lessonId: number) => {
   const response = await client.get(`/lessons/${lessonId}`);
 
-  return response.data;
+  return response.data.data;
 };
 
 /**
@@ -23,6 +22,5 @@ export const getLessonById = async (lessonId: number) => {
  */
 export const continueLearning = async () => {
   const response = await client.get("/continue-learning");
-
   return response.data;
 };

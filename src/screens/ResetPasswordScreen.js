@@ -93,7 +93,7 @@ export default function ResetPasswordScreen({
     ],
   });
 
-} catch (error: any) {
+} catch (error) {
 
   console.log("RESET PASSWORD ERROR", error);
 

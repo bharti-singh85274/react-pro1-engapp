@@ -6,88 +6,188 @@ import {
   StyleSheet,
 } from "react-native";
 
+import ProgressBar from "../ProgressBar";
+
 export default function ContinueLearningCard({
   course,
   lesson,
   progress,
   navigation,
 }) {
+
   if (!course) {
     return null;
   }
 
+ 
+
+  const percentage =
+  typeof progress === "number"
+    ? progress
+    : progress?.progress ??
+      progress?.progress_percentage ??
+      progress?.percentage ??
+      0;
+
+
+  const completedLessons =
+    progress?.completed_lessons ?? 0;
+
+  const totalLessons =
+    progress?.total_lessons ?? 0;
+
   return (
+
     <View style={styles.card}>
+
       <Text style={styles.heading}>
         Continue Learning
       </Text>
 
-      <Text style={styles.title}>
+      <Text style={styles.course}>
         {course.title}
       </Text>
 
       <Text style={styles.lesson}>
-        {lesson ? lesson.title : "Course Completed 🎉"}
+        {lesson?.title ?? "Course Completed 🎉"}
       </Text>
 
-      <Text style={styles.lesson}>
-        {progress.completed_lessons} of {progress.total_lessons} lessons completed
+     <Text style={styles.progressText}>
+          {percentage}% Complete
       </Text>
+
+      <View style={styles.progressContainer}>
+          <ProgressBar progress={percentage} />
+      </View>
+
+     <Text style={styles.lessonCount}>
+        {completedLessons} of {totalLessons} lessons completed
+    </Text>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
+
           if (lesson) {
+
             navigation.navigate("Lesson", {
               lessonId: lesson.id,
             });
+
           }
+
         }}
       >
+
         <Text style={styles.buttonText}>
-          Resume
+          ▶ Continue Lesson
         </Text>
+
       </TouchableOpacity>
+
     </View>
+
   );
+
 }
 
 const styles = StyleSheet.create({
+
   card: {
+
     backgroundColor: "#2563EB",
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 20,
+
+    borderRadius: 18,
+
+    padding: 22,
+
   },
 
   heading: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
 
-  title: {
-    color: "#fff",
-    fontSize: 22,
-    marginTop: 10,
-    fontWeight: "bold",
-  },
-
-  lesson: {
     color: "#E5E7EB",
-    marginVertical: 10,
+
+    fontSize: 15,
+
+    fontWeight: "600",
+
   },
 
-  button: {
+  course: {
+
+    color: "#fff",
+
+    fontSize: 24,
+
+    fontWeight: "700",
+
+    marginTop: 6,
+
+  },
+
+lesson:{
+
+    color:"#DBEAFE",
+
+    fontSize:15,
+
+    marginTop:5,
+
+},
+
+ lessonCount:{
+
+    color:"#DBEAFE",
+
+    fontSize:14,
+
+    marginTop:12,
+
+},
+
+  progressContainer: {
+
     marginTop: 15,
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 8,
-    alignItems: "center",
+
   },
 
-  buttonText: {
-    fontWeight: "bold",
-    color: "#2563EB",
-  },
+ progressText:{
+
+    color:"#FFFFFF",
+
+    fontSize:20,
+
+    fontWeight:"700",
+
+    marginTop:22,
+
+    marginBottom:10,
+
+},
+
+ button:{
+
+    marginTop:24,
+
+    backgroundColor:"#FFFFFF",
+
+    paddingVertical:16,
+
+    borderRadius:12,
+
+    alignItems:"center",
+
+},
+
+
+  buttonText:{
+
+    color:"#2563EB",
+
+    fontWeight:"700",
+
+    fontSize:17,
+
+},
+
 });

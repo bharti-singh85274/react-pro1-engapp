@@ -14,10 +14,37 @@ export default function CourseCard({
   onPress,
 }) {
 
-  const percentage = progress?.percentage ?? 0;
-  const completedLessons = progress?.completed_lessons ?? 0;
-  const totalLessons = progress?.total_lessons ?? item.lessons_count;
-  const status = progress?.status ?? "not_started";
+
+
+
+const progressData = item.progress ?? progress ?? {};
+
+const percentage =
+    typeof progressData === "number"
+      ? progressData
+      : progressData.percentage ??
+        progressData.progress_percentage ??
+        progressData.progress ??
+        item.progress_percentage ??
+        item.percentage ??
+        0;
+
+
+const completedLessons =
+    progressData.completed_lessons ??
+    item.completed_lessons ??
+    0;
+
+const totalLessons =
+    progressData.total_lessons ??
+    item.total_lessons ??
+    item.lessons_count ??
+    0;
+
+const status =
+    progressData.status ??
+    item.status ??
+    "not_started";
 
   const getStatusColor = () => {
     switch (status) {
@@ -55,24 +82,13 @@ export default function CourseCard({
             {item.title}
           </Text>
 
-          <Text style={styles.desc}>
-            {item.short_description}
-          </Text>
+         <Text style={styles.desc}>
+            {item.reason}
+            </Text>
 
         </View>
 
-        <View
-          style={[
-            styles.level,
-            {
-              backgroundColor: item.theme_color,
-            },
-          ]}
-        >
-          <Text style={styles.levelText}>
-            {item.level}
-          </Text>
-        </View>
+      
 
       </View>
 
@@ -113,21 +129,18 @@ export default function CourseCard({
 
       </View>
 
-      <View style={styles.footer}>
+    <View style={styles.footer}>
 
-        <Text style={styles.footerText}>
-          ⭐ {item.rating}
-        </Text>
+      <Text style={styles.footerText}>
+      📘 {completedLessons}/{totalLessons} Lessons
+      </Text>
 
-        <Text style={styles.footerText}>
-          ⏱ {item.duration}
-        </Text>
-
-        <Text style={styles.footerText}>
-          🎁 {item.xp_reward} XP
-        </Text>
+      <Text style={styles.footerText}>
+      {getStatusText()}
+      </Text>
 
       </View>
+
 
     </TouchableOpacity>
   );

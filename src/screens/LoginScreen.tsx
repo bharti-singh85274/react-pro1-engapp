@@ -192,7 +192,7 @@ export default function LoginScreen({
             }}
           />
 
-          <Input
+       <Input
             label="Password"
             placeholder="Enter your password"
             value={password}
@@ -200,7 +200,6 @@ export default function LoginScreen({
             autoCapitalize="none"
             error={errors.password}
             onChangeText={(text) => {
-
               setPassword(text);
 
               setErrors((prev: any) => ({
@@ -209,7 +208,6 @@ export default function LoginScreen({
               }));
 
               setLoginError("");
-
             }}
           />
 

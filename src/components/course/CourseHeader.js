@@ -6,7 +6,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-const BASE_URL = "http://192.168.1.30:8000/storage/";
+const BASE_URL = "http://10.214.7.181:8000/storage/";
 
 export default function CourseHeader({ course }) {
   return (
